@@ -37,6 +37,7 @@ highlight ColorColumn ctermbg=0 guibg=lightgrey
 call plug#begin('~/.vim/plugged')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 Plug 'tweekmonster/gofmt.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'vim-utils/vim-man'
@@ -50,6 +51,8 @@ Plug 'junegunn/fzf.vim'
 " NERDtree
 Plug 'scrooloose/nerdtree'
 Plug 'ryanoasis/vim-devicons'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 " Tema
 Plug 'gruvbox-community/gruvbox'
@@ -116,22 +119,6 @@ let g:fzf_action = {
 "ignorar los node_modules de npm al buscar archivos
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 
-" --- vim go (polyglot) settings.
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_types = 1
-let g:go_highlight_function_parameters = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_generate_tags = 1
-let g:go_highlight_format_strings = 1
-let g:go_highlight_variable_declarations = 1
-let g:go_auto_sameids = 1
-
 colorscheme gruvbox
 set background=dark
 
@@ -166,8 +153,21 @@ nnoremap <Leader>ee oif err != nil {<CR>log.Fatalf("%+v\n", err)<CR>}<CR><esc>kk
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
-"nnoremap ; :
-"nnoremap : ;
+nnoremap ; :
+nnoremap : ;
+inoremap ; :
+inoremap : ;
+nnoremap <C-s> :w<CR>
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
 
 " Vim with me
 nnoremap <leader>vwm :colorscheme gruvbox<bar>:set background=dark<CR>
@@ -222,22 +222,12 @@ autocmd BufWritePre * :call TrimWhitespace()
 
 
 "----------------------------- TERMINAL ----------------------------------------
-
 " Terminal
 :tnoremap <Esc> <C-\><C-n>
-" start terminal in insert mode
-"au BufEnter * if &buftype == 'terminal' | :startinsert | endif
-" open terminal on ctrl+n
-"function! OpenTerminal()
-"  split
-"  term
-"  resize 10
-"endfunction
-"nnoremap <c-n> :call OpenTerminal()<CR>
-
-
+au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 " Toggle 'default' terminal
 nnoremap <C-n> :call ChooseTerm("term-slider", 1)<CR>
+inoremap <C-n> <C-\><C-n>:call ChooseTerm("term-slider", 1)<CR>
 " Start terminal in current pane
 "nnoremap <C-k> :call ChooseTerm("term-pane", 0)<CR>
 
