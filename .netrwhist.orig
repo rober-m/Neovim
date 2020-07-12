@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='/Users/robertino/.config/nvim'
+let g:netrw_dirhist_8='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src/componentes'
+let g:netrw_dirhist_7='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src'
+let g:netrw_dirhist_6='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh'
+let g:netrw_dirhist_5='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src/logica'
+let g:netrw_dirhist_4='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src'
+let g:netrw_dirhist_3='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src/logica'
+let g:netrw_dirhist_2='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src'
+let g:netrw_dirhist_1='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src/componentes'
+let g:netrw_dirhist_0='/Users/robertino/Documents/Desarrollo_apps/WebApps/modelos_nn_srh/src'
