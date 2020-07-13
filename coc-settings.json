@@ -10,5 +10,6 @@
     "graphql",
     "css",
     "html"
-  ]
+  ],
+  "typescript.validate.enable": false
 }

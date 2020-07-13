@@ -62,6 +62,9 @@ Plug 'vim-airline/vim-airline'
 Plug 'flazz/vim-colorschemes'
 Plug '/home/mpaulson/personal/vim-be-good'
 
+" Comentarios
+Plug 'tpope/vim-commentary'
+
 call plug#end()
 
 
@@ -73,6 +76,9 @@ if exists('+termguicolors')
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 let g:gruvbox_invert_selection='0'
+
+colorscheme gruvbox
+set background=dark
 
 " --- The Greatest plugin of all time.  I am not bias
 " let g:vim_be_good_floating = 0
@@ -119,8 +125,6 @@ let g:fzf_action = {
 "ignorar los node_modules de npm al buscar archivos
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 
-colorscheme gruvbox
-set background=dark
 
 if executable('rg')
     let g:rg_derive_root='true'
@@ -153,11 +157,22 @@ nnoremap <Leader>ee oif err != nil {<CR>log.Fatalf("%+v\n", err)<CR>}<CR><esc>kk
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 
+" IMPORTANTE: Fugitive tiene problemas debido al cambio de : y ;
 nnoremap ; :
 nnoremap : ;
 inoremap ; :
 inoremap : ;
+
 nnoremap <C-s> :w<CR>
+
+
+" Vim with me
+nmap <leader>vtm :highlight Pmenu ctermbg=gray guibg=gray
+
+vnoremap X "_d
+inoremap <C-c> <esc>
+
+"-----------------------------  COC  ----------------------------------------
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -168,14 +183,6 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
-
-" Vim with me
-nnoremap <leader>vwm :colorscheme gruvbox<bar>:set background=dark<CR>
-nmap <leader>vtm :highlight Pmenu ctermbg=gray guibg=gray
-
-vnoremap X "_d
-inoremap <C-c> <esc>
-
 function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~# '\s'
@@ -185,6 +192,7 @@ inoremap <silent><expr> <TAB>
             \ pumvisible() ? "\<C-n>" :
             \ <SID>check_back_space() ? "\<TAB>" :
             \ coc#refresh()
+
 
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
@@ -202,11 +210,14 @@ nmap <silent> <leader>gp <Plug>(coc-diagnostic-prev-error)
 nmap <silent> <leader>gn <Plug>(coc-diagnostic-next-error)
 nnoremap <leader>cr :CocRestart
 
-" Sweet Sweet FuGITive
-nmap <leader>gh :diffget //3<CR>
-nmap <leader>gu :diffget //2<CR>
-nmap <leader>gs :G<CR>
-
+"-----------------------------  FuGITive  ----------------------------------------
+" IMPORTANTE:  Los comandos comienzan con ; porque Fugitive tiene problemas debido
+" al cambio de : y ;. Los otros mapeos no tienen drama, no se porque
+nmap <leader>gj ;diffget //3<CR>
+nmap <leader>gf ;diffget //2<CR>
+nmap <leader>gs ;G<CR>
+"---------------------------------------------------------------------------------
+"
 fun! TrimWhitespace()
     let l:save = winsaveview()
     keeppatterns %s/\s\+$//e
@@ -258,3 +269,6 @@ function! ChooseTerm(termname, slider)
 		:exe "f " a:termname
 	endif
 endfunction
+
+"----------------------------- COMENTARIOS ----------------------------------------
+noremap <leader>/ :Commentary<cr>
