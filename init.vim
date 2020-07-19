@@ -68,6 +68,9 @@ Plug 'tpope/vim-commentary'
 " Color primera ocurrencia de letra en una linea
 Plug 'unblevable/quick-scope'
 
+" HTML close tags
+Plug 'alvan/vim-closetag'
+
 call plug#end()
 
 
@@ -289,3 +292,20 @@ endfunction
 "----------------------------- COMENTARIOS ----------------------------------------
 noremap <leader>/ :Commentary<cr>
 
+"-----------------------------  HTML vim-closetag ----------------------------------------
+" filenames like *.xml, *.html, *.xhtml, ...
+" These are the file extensions where this plugin is enabled.
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
+" filetypes like xml, html, xhtml, ...
+" These are the file types where this plugin is enabled.
+let g:closetag_filetypes = 'html,xhtml,phtml'
+" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
+let g:closetag_emptyTags_caseSensitive = 0
+" Disables auto-close if not in a "valid" region (based on filetype)
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ }
+
+" Shortcut for closing tags, default is '>'
+let g:closetag_shortcut = '>'
