@@ -10,6 +10,7 @@ set expandtab
 set smartindent
 set nu
 set nowrap
+set ignorecase
 set smartcase
 set noswapfile
 set nobackup
@@ -130,7 +131,7 @@ function! SyncTree()
 endfunction
 
 " Highlight currently open buffer in NERDTree
-autocmd BufEnter * call SyncTree()
+" autocmd BufEnter * call SyncTree()
 
 "-----------------------------FUZZY FINDER----------------------------------------
 
@@ -181,12 +182,6 @@ nnoremap ; :
 nnoremap : ;
 inoremap ; :
 inoremap : ;
-
-nnoremap <C-s> :w<CR>
-
-
-" Vim with me
-nmap <leader>vtm :highlight Pmenu ctermbg=gray guibg=gray
 
 vnoremap X "_d
 inoremap <C-c> <esc>
@@ -293,11 +288,7 @@ endfunction
 noremap <leader>/ :Commentary<cr>
 
 "-----------------------------  HTML vim-closetag ----------------------------------------
-" filenames like *.xml, *.html, *.xhtml, ...
-" These are the file extensions where this plugin is enabled.
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
-" filetypes like xml, html, xhtml, ...
-" These are the file types where this plugin is enabled.
 let g:closetag_filetypes = 'html,xhtml,phtml'
 " This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
 let g:closetag_emptyTags_caseSensitive = 0
@@ -309,3 +300,7 @@ let g:closetag_regions = {
 
 " Shortcut for closing tags, default is '>'
 let g:closetag_shortcut = '>'
+
+"----------------------------- ACCESO RÁPIDO A TODO y FIXME  ----------------------------------------
+nnoremap <leader>t :Ag TODO<cr>
+nnoremap <leader>f :Ag FIXME<cr>
