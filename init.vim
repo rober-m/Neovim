@@ -1,3 +1,6 @@
+
+" For HELP: Put the cursor on the word you need help and type <leader>ahw
+
 set guicursor=
 set noshowmatch
 set relativenumber
@@ -21,19 +24,17 @@ set termguicolors
 set scrolloff=8
 set splitright
 set splitbelow
-
-" Give more space for displaying messages.
 set cmdheight=2
-
-" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-" delays and poor user experience.
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable delays and poor user experience.
 set updatetime=50
-
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
-
+" Grey column
 set colorcolumn=100
 highlight ColorColumn ctermbg=0 guibg=lightgrey
+
+"---------------------------------------  PLUGINS  ------------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
 call plug#begin('~/.vim/plugged')
 
@@ -74,8 +75,8 @@ Plug 'alvan/vim-closetag'
 
 call plug#end()
 
-
-"-----------------------------  QUICK SCOPE  ----------------------------------------
+"-------------------------------------  QUICK SCOPE  ----------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
 " Trigger a highlight in the appropriate direction when pressing these keys:
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
@@ -88,7 +89,8 @@ augroup END
 
 let g:qs_max_chars=150
 
-"----------------------------- TEMA ----------------------------------------
+"---------------------------------------- THEME ---------------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
 let g:gruvbox_contrast_dark = 'hard'
 if exists('+termguicolors')
@@ -104,13 +106,15 @@ set background=dark
 " let g:vim_be_good_floating = 0
 
 
-"----------------------------- NERDtree ----------------------------------------
+"-------------------------------------- NERDtree --------------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
 " Configurac NERDtree
 let g:NERDTreeShowHidden = 1
 let g:NERDTreeMinimalUI = 1
 let g:NERDTreeIgnore = []
 let g:NERDTreeStatusline = ''
+
 " Automaticaly close nvim if NERDTree is only thing left open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " Toggle
@@ -133,7 +137,9 @@ endfunction
 " Highlight currently open buffer in NERDTree
 " autocmd BufEnter * call SyncTree()
 
-"-----------------------------FUZZY FINDER----------------------------------------
+
+"----------------------------------FUZZY FINDER CONFIG --------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
 "Config fuzzi finder
 nnoremap <C-p> :FZF<CR>
@@ -153,40 +159,68 @@ endif
 let loaded_matchparen = 1
 let mapleader = " "
 
-let g:netrw_browse_split = 2
 let g:vrfr_rg = 'true'
-let g:netrw_banner = 0
-let g:netrw_winsize = 25
 
-nnoremap <leader>pw :Rg <C-R>=expand("<cword>")<CR><CR>
-nnoremap <leader>phw :h <C-R>=expand("<cword>")<CR><CR>
+"--------------------------------------------------------------------------------------------------
+"------------------------------------  SEARCH REMAPS  ---------------------------------------------
+
+"Search inside the files in current directory
+nnoremap <Leader>s :Rg<SPACE>
+"Search files by name in current directory
+nnoremap <Leader>o :Files<CR>
+"Search for word under cursor with fzf (search word)
+nnoremap <leader>sw :Rg <C-R>=expand("<cword>")<CR><CR>
+"Search for help of word under cursor (search help word)
+nnoremap <leader>shw :h <C-R>=expand("<cword>")<CR><CR>
+"Acceso rápido a TODO
+nnoremap <leader>t :Rg TODO<cr>
+"Acceso rápido a FIXME
+nnoremap <leader>f :Rg FIXME<cr>
+
+"--------------------------------------------------------------------------------------------------
+"------------------------------  WINDOW MANAGEMENT/MOVEMENT  --------------------------------------
+
+"Move between windows
 nnoremap <leader>h :wincmd h<CR>
 nnoremap <leader>j :wincmd j<CR>
 nnoremap <leader>k :wincmd k<CR>
 nnoremap <leader>l :wincmd l<CR>
-nnoremap <leader>u :UndotreeShow<CR>
-nnoremap <leader>pv :wincmd v<bar> :Ex <bar> :vertical resize 30<CR>
-nnoremap <Leader>ps :Rg<SPACE>
-nnoremap <C-p> :GFiles<CR>
-nnoremap <Leader>pf :Files<CR>
-nnoremap <Leader><CR> :so ~/.config/nvim/init.vim<CR>
+
+"Windows size modification
 nnoremap <Leader>+ :vertical resize +5<CR>
 nnoremap <Leader>- :vertical resize -5<CR>
 nnoremap <Leader>rp :resize 100<CR>
-nnoremap <Leader>ee oif err != nil {<CR>log.Fatalf("%+v\n", err)<CR>}<CR><esc>kkI<esc>
+
+"TODO: Marks. Find out more about marks to use this
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+
+"--------------------------------------------------------------------------------------------------
+"------------------------------------  EDITING  ---------------------------------------------------
+
+"Show undo tree (allows to see a timeline of changes made to the file)
+nnoremap <leader>u :UndotreeShow<CR>
+
+"Sources confg file of Nvim. Useful only when testing init.vim changes
+nnoremap <Leader><CR> :so ~/.config/nvim/init.vim<CR>
 
 " IMPORTANTE: Fugitive tiene problemas debido al cambio de : y ;
 nnoremap ; :
 nnoremap : ;
-inoremap ; :
-inoremap : ;
+"inoremap ; :
+"inoremap : ;
 
+" Don't save on register when deleting with uppercase X on visual mode
 vnoremap X "_d
+
+"Escape from visual mode with Ctrl+c (Second option after CapsLock remap on OS)
 inoremap <C-c> <esc>
 
-"-----------------------------  COC  ----------------------------------------
+" Comment
+noremap <leader>/ :Commentary<cr>
+
+"--------------------------------------------------------------------------------------------------
+"---------------------------------------  COC  ----------------------------------------------------
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -224,14 +258,28 @@ nmap <silent> <leader>gp <Plug>(coc-diagnostic-prev-error)
 nmap <silent> <leader>gn <Plug>(coc-diagnostic-next-error)
 nnoremap <leader>cr :CocRestart
 
-"-----------------------------  FuGITive  ----------------------------------------
+"--------------------------------------------------------------------------------------------------
+"------------------------------------  FuGITive  --------------------------------------------------
+
 " IMPORTANTE:  Los comandos comienzan con ; porque Fugitive tiene problemas debido
 " al cambio de : y ;. Los otros mapeos no tienen drama, no se porque
 nmap <leader>gj ;diffget //3<CR>
 nmap <leader>gf ;diffget //2<CR>
 nmap <leader>gs ;G<CR>
-"---------------------------------------------------------------------------------
-"
+
+"--------------------------------------------------------------------------------------------------
+"-------=---------------------- netrw TODO: What is this?  ----------------------------------------
+
+" When seleting a file with enter, open in new vertically-splited window
+let g:netrw_browse_split = 2
+"Remove NERDTree banner
+let g:netrw_banner = 0
+" Give 25% of size to new windows
+let g:netrw_winsize = 25
+
+"--------------------------------------------------------------------------------------------------
+"--------------------------------- TODO: What is this?  -------------------------------------------
+
 fun! TrimWhitespace()
     let l:save = winsaveview()
     keeppatterns %s/\s\+$//e
@@ -245,8 +293,9 @@ augroup END
 
 autocmd BufWritePre * :call TrimWhitespace()
 
+"-------------------------------------- TERMINAL --------------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
-"----------------------------- TERMINAL ----------------------------------------
 " Terminal
 :tnoremap <Esc> <C-\><C-n>
 au BufEnter * if &buftype == 'terminal' | :startinsert | endif
@@ -284,10 +333,9 @@ function! ChooseTerm(termname, slider)
 	endif
 endfunction
 
-"----------------------------- COMENTARIOS ----------------------------------------
-noremap <leader>/ :Commentary<cr>
+"----------------------------------  HTML vim-closetag --------------------------------------------
+"--------------------------------------------------------------------------------------------------
 
-"-----------------------------  HTML vim-closetag ----------------------------------------
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
 let g:closetag_filetypes = 'html,xhtml,phtml'
 " This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
@@ -301,6 +349,6 @@ let g:closetag_regions = {
 " Shortcut for closing tags, default is '>'
 let g:closetag_shortcut = '>'
 
-"----------------------------- ACCESO RÁPIDO A TODO y FIXME  ----------------------------------------
-nnoremap <leader>t :Ag TODO<cr>
-nnoremap <leader>f :Ag FIXME<cr>
+"--------------------------------------------------------------------------------------------------
+"--------------------------------------------------------------------------------------------------
+"--------------------------------------------------------------------------------------------------

@@ -11,5 +11,5 @@
     "css",
     "html"
   ],
-  "typescript.validate.enable": false
+  "typescript.validate.enable": true
 }
