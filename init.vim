@@ -30,7 +30,10 @@ set updatetime=50
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
 " Grey column
-set colorcolumn=100
+set colorcolumn=120
+"To make backspace work normally
+set backspace=indent,eol,start
+"Highlight verticalline
 highlight ColorColumn ctermbg=0 guibg=lightgrey
 
 "---------------------------------------  PLUGINS  ------------------------------------------------
