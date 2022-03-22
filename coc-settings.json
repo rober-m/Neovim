@@ -9,7 +9,10 @@
     "typescript.tsx",
     "graphql",
     "css",
-    "html"
+    "html",
+    "mdx",
+    "md",
+    "haskell"
   ],
   "typescript.validate.enable": true
 }

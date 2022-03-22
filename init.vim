@@ -1,6 +1,3 @@
-
-" For HELP: Put the cursor on the word you need help and type <leader>ahw
-
 set guicursor=
 set noshowmatch
 set relativenumber
@@ -35,16 +32,24 @@ set colorcolumn=120
 set backspace=indent,eol,start
 "Highlight verticalline
 highlight ColorColumn ctermbg=0 guibg=lightgrey
+" Set python3 provider
+let g:python3_host_prog = '/usr/local/bin/python3'
 
 "---------------------------------------  PLUGINS  ------------------------------------------------
 "--------------------------------------------------------------------------------------------------
 
 call plug#begin('~/.vim/plugged')
+"call plug#begin(stdpth('data') . '/plugged')
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Language server
+Plug 'neovim/nvim-lspconfig'
+Plug 'tami5/lspsaga.nvim'
+
+" Tree-sitter for better highlight
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 Plug 'tweekmonster/gofmt.vim'
-Plug 'tpope/vim-fugitive'
+" Plug 'tpope/vim-fugitive'
 Plug 'vim-utils/vim-man'
 Plug 'mbbill/undotree'
 Plug 'sheerun/vim-polyglot'
@@ -77,6 +82,172 @@ Plug 'unblevable/quick-scope'
 Plug 'alvan/vim-closetag'
 
 call plug#end()
+
+"--------------------------------------  LSP config  ----------------------------------------------
+"--------------------------------------------------------------------------------------------------
+
+lua << EOF
+local nvim_lsp = require('lspconfig')
+
+local on_attach = function(client, bufnr)
+
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+  -- Mappings.
+  local opts = { noremap=true, silent=true }
+  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+  --buf_set_keymap('n', '<C-j>', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  --buf_set_keymap('n', '<S-C-j>', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  --buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+
+  if client.resolved_capabilities.document_formatting then
+    vim.api.nvim_command [[augroup Format]]
+    vim.api.nvim_command [[autocmd! * <buffer>]]
+    vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
+    vim.api.nvim_command [[augroup END]]
+  end
+end
+
+-- Typescript
+nvim_lsp.tsserver.setup {
+    on_attach = on_attach,
+    filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascriptreact" }
+}
+
+-- Diagnostics, Linting, and Formatting
+nvim_lsp.diagnosticls.setup {
+  on_attach = on_attach,
+  filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'markdown', 'pandoc' },
+  init_options = {
+    linters = {
+      eslint = {
+        command = 'eslint_d',
+        rootPatterns = { '.git' },
+        debounce = 100,
+        args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
+        sourceName = 'eslint_d',
+        parseJson = {
+          errorsRoot = '[0].messages',
+          line = 'line',
+          column = 'column',
+          endLine = 'endLine',
+          endColumn = 'endColumn',
+          message = '[eslint] ${message} [${ruleId}]',
+          security = 'severity'
+        },
+        securities = {
+          [2] = 'error',
+          [1] = 'warning'
+        }
+      },
+    },
+    filetypes = {
+      javascript = 'eslint',
+      javascriptreact = 'eslint',
+      typescript = 'eslint',
+      typescriptreact = 'eslint',
+    },
+    formatters = {
+      eslint_d = {
+        command = 'eslint_d',
+        args = { '--stdin', '--stdin-filename', '%filename', '--fix-to-stdout' },
+        rootPatterns = { '.git' },
+      },
+      prettier = {
+        command = 'prettier',
+        args = { '--stdin-filepath', '%filename' }
+      }
+    },
+    formatFiletypes = {
+      css = 'prettier',
+      javascript = 'eslint_d',
+      javascriptreact = 'eslint_d',
+      json = 'prettier',
+      scss = 'prettier',
+      less = 'prettier',
+      typescript = 'eslint_d',
+      typescriptreact = 'eslint_d',
+      json = 'prettier',
+      markdown = 'prettier',
+    }
+  }
+}
+
+-- Diagnostics icon
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    underline = true,
+    -- This sets the spacing and the prefix, obviously.
+    virtual_text = {
+      spacing = 4,
+      prefix = ''
+    }
+  }
+)
+
+EOF
+
+
+"--------------------------------------  LSP SAGA   -----------------------------------------------
+"--------------------------------------------------------------------------------------------------
+lua << EOF
+local saga = require 'lspsaga'
+
+saga.init_lsp_saga {
+  error_sign = '',
+  warn_sign = '',
+  hint_sign = '',
+  infor_sign = '',
+  border_style = "round",
+}
+EOF
+
+nnoremap <silent> <C-j> :Lspsaga diagnostic_jump_next<CR>
+nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
+nnoremap <silent> gh :Lspsaga lsp_finder<CR>
+nnoremap <silent> gp :Lspsaga preview_definition<CR>
+
+
+"-------------------------------------  TREESITTER   ----------------------------------------------
+"--------------------------------------------------------------------------------------------------
+
+lua << EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    disable = {},
+  },
+  indent = {
+    enable = false,
+    disable = {},
+  },
+  ensure_installed = {
+    "tsx",
+    "toml",
+    "fish",
+    "php",
+    "json",
+    "yaml",
+    "swift",
+    "html",
+    "css"
+  },
+}
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
+
+EOF
+
 
 "-------------------------------------  QUICK SCOPE  ----------------------------------------------
 "--------------------------------------------------------------------------------------------------
@@ -226,49 +397,49 @@ noremap <leader>/ :Commentary<cr>
 "---------------------------------------  COC  ----------------------------------------------------
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+" nnoremap <silent> K :call <SID>show_documentation()<CR>
+" function! s:show_documentation()
+"   if (index(['vim','help'], &filetype) >= 0)
+"     execute 'h '.expand('<cword>')
+"   else
+"     call CocAction('doHover')
+"   endif
+" endfunction
+" function! s:check_back_space() abort
+"     let col = col('.') - 1
+"     return !col || getline('.')[col - 1]  =~# '\s'
+" endfunction
 
-inoremap <silent><expr> <TAB>
-            \ pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
-            \ coc#refresh()
+" inoremap <silent><expr> <TAB>
+"             \ pumvisible() ? "\<C-n>" :
+"             \ <SID>check_back_space() ? "\<TAB>" :
+"             \ coc#refresh()
 
 
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-inoremap <silent><expr> <C-space> coc#refresh()
+" command! -nargs=0 Prettier :CocCommand prettier.formatFile
+" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+" inoremap <silent><expr> <C-space> coc#refresh()
 
-" GoTo code navigation.
-nmap <leader>gd <Plug>(coc-definition)
-nmap <leader>gy <Plug>(coc-type-definition)
-nmap <leader>gi <Plug>(coc-implementation)
-nmap <leader>gr <Plug>(coc-references)
-nmap <leader>rr <Plug>(coc-rename)
-nmap <leader>g[ <Plug>(coc-diagnostic-prev)
-nmap <leader>g] <Plug>(coc-diagnostic-next)
-nmap <silent> <leader>gp <Plug>(coc-diagnostic-prev-error)
-nmap <silent> <leader>gn <Plug>(coc-diagnostic-next-error)
-nnoremap <leader>cr :CocRestart
+" " GoTo code navigation.
+" nmap <leader>gd <Plug>(coc-definition)
+" nmap <leader>gy <Plug>(coc-type-definition)
+" nmap <leader>gi <Plug>(coc-implementation)
+" nmap <leader>gr <Plug>(coc-references)
+" nmap <leader>rr <Plug>(coc-rename)
+" nmap <leader>g[ <Plug>(coc-diagnostic-prev)
+" nmap <leader>g] <Plug>(coc-diagnostic-next)
+" nmap <silent> <leader>gp <Plug>(coc-diagnostic-prev-error)
+" nmap <silent> <leader>gn <Plug>(coc-diagnostic-next-error)
+" nnoremap <leader>cr :CocRestart
 
 "--------------------------------------------------------------------------------------------------
 "------------------------------------  FuGITive  --------------------------------------------------
 
 " IMPORTANTE:  Los comandos comienzan con ; porque Fugitive tiene problemas debido
 " al cambio de : y ;. Los otros mapeos no tienen drama, no se porque
-nmap <leader>gj ;diffget //3<CR>
-nmap <leader>gf ;diffget //2<CR>
-nmap <leader>gs ;G<CR>
+" nmap <leader>gj ;diffget //3<CR>
+" nmap <leader>gf ;diffget //2<CR>
+" nmap <leader>gs ;G<CR>
 
 "--------------------------------------------------------------------------------------------------
 "-------=---------------------- netrw TODO: What is this?  ----------------------------------------
